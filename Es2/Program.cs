@@ -1,10 +1,18 @@
 ﻿using System;
 using System.IO;
+using System.Collections.Generic;
 
 namespace Es2
 {
     class Program
     {
+        // mappina di associazione tra tasto premuto e livello
+        private static Dictionary<ConsoleKey, Livello> _map = 
+            new Dictionary<ConsoleKey, Livello>()
+            { { ConsoleKey.B, Livello.Basso},
+            { ConsoleKey.M, Livello.Medio},
+            { ConsoleKey.A, Livello.Alto}};
+
         private static TaskManager taskManager = new TaskManager();
         static void Main(string[] args)
         {
@@ -56,22 +64,10 @@ namespace Es2
             {
                 Console.Write("Quale livello vuoi visualizzare (Basso, Medio, Alto): ");
                 key = Console.ReadKey().Key;
-            } while (key != ConsoleKey.B && key != ConsoleKey.M && key != ConsoleKey.A);
-
-            Livello livello = Livello.Basso;
-
-            switch (key)
-            {
-                case ConsoleKey.M:
-                    livello = Livello.Medio;
-                    break;
-                case ConsoleKey.A:
-                    livello = Livello.Alto;
-                    break;
-            }
+            } while (!_map.ContainsKey(key));
 
             Console.WriteLine();
-            Console.WriteLine(taskManager.OttieniElenco(livello, Formato.Plain));
+            Console.WriteLine(taskManager.OttieniElenco(_map[key], Formato.Plain));
         }
 
         // richiede l'id per eliminare il task
@@ -125,26 +121,11 @@ namespace Es2
             {
                 Console.Write("Livello di importanza (Basso, Medio, Alto): ");
                 key = Console.ReadKey().Key;
-            } while (key != ConsoleKey.B && key != ConsoleKey.M && key != ConsoleKey.A);
-
-            Livello livello = Livello.Basso;    // attribuisco un valore che non testerò nello switch
-
-            switch (key)
-            {
-                //case ConsoleKey.B:
-                //    livello = Livello.Basso;
-                //    break;
-                case ConsoleKey.M:
-                    livello = Livello.Medio;
-                    break;
-                case ConsoleKey.A:
-                    livello = Livello.Alto;
-                    break;
-            }
+            } while (!_map.ContainsKey(key));
 
             Console.WriteLine();
 
-            Task t = taskManager.CreaTask(descrizione, dataScadenza, livello);
+            Task t = taskManager.CreaTask(descrizione, dataScadenza, _map[key]);
             Console.WriteLine($"Task {t.Id} creato.");
         }
     }
